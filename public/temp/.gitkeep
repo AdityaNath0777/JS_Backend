@@ -1,0 +1,9 @@
+git tracks changes in files, not folders. 
+
+Therefore, adding an empty file .gitkeep to push an empty folder to the repository 
+
+in case we need that folder in the future.
+
+for our purpose, we will temporarily store images on the server 
+
+before uploading them to a third-party service like AWS, Azure, etc.

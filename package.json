@@ -2,11 +2,20 @@
   "name": "shikanji-backend",
   "version": "1.0.0",
   "description": "a backend course in JavaScript with professional and industry level approach while enjoying some Shikanji",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js"
   },
-  "keywords": ["JavaScript", "backend", "chai", "shikanji"],
+  "keywords": [
+    "JavaScript",
+    "backend",
+    "chai",
+    "shikanji"
+  ],
   "author": "Aditya Nath",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
 }
