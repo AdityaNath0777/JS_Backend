@@ -17,8 +17,8 @@ class ApiError extends Error {
     // and the message property (among others) would not be set correctly.
 
     // remember? -> this -> gives ref
-    // here 'this' gives ref of the class it belongs to
-    this.statusCode = statusCode;
+    // here 'this' gives ref to the instance of the class it belongs to
+    // this.statusCode = statusCode;
 
     this.statusCode = statusCode; // Set HTTP status code
     this.data = null; // Placeholder for additional error data

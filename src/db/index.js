@@ -11,6 +11,11 @@ const connectDB = async () => {
   } catch (error) {
     console.log("MongoDB Connection FAILED:: ", error);
 
+    // process.exit(1):
+    // Terminates the process: It stops the Node.js process immediately.
+    // Exit code 1: This code indicates that the process exited due to an error. 
+    // a non-zero exit code (usually 1) signifies that the process encountered an error or abnormal condition.
+
     process.exit(1)
   }
 }

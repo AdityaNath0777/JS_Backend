@@ -20,8 +20,8 @@ const userSchema = new Schema(
       //  indexing makes easier searching
       index: true, // caution
 
-      // indexing should be choosed carefully,
-      // might affect performance greatly
+      // indexing should be chosen carefully,
+      // might greatly affect the performance 
     },
     email: {
       type: String,
@@ -76,14 +76,17 @@ userSchema.pre("save", async function(next) {
   // next() // pass the flag to the next middleware
 })
 
-
+// next is a function provided to move to the next middleware in the stack. 
+// It must be called to pass control to the next middleware function 
+// or the actual operation (save, update, etc.).
 
 
 
 /***** NOTE: CAUTION ***** */
 
-// not recommended as ()=>{} don't has this reference
+// not recommended as ()=>{} does not have their own this reference
 // userSchema.pre("save", () => {})
+//   they inherit it from the surronding scope/execution context
 
 /*************************** */
 
@@ -97,6 +100,7 @@ userSchema.pre("save", async function(next) {
 // to compare password
 userSchema.methods.isPasswordCorrect = async function (password) {
   // cryptography takes time
+                          //  (data, alreadyHashedData)
   return await bcrypt.compare(password, this.password)
 }
 

@@ -4,7 +4,16 @@ import dotenv from "dotenv";
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
 
-dotenv.config({
+
+/*  './': Refers to the current working directory 
+ *  from which the Node.js process was started
+ *
+ *  remember? "node src/index.js" script in the pkg.json
+ * 
+ *  here Node.js process started in the project's working dir 
+*/
+
+ dotenv.config({
   path: "./.env",
 });
 
@@ -14,13 +23,16 @@ connectDB()
     app.listen(port, () => {
       console.log(`Server is running at port: ${port}`);
     });
-  })
-  .catch((error) => {
-    console.log("MongoDB Error :: before app on :: ", error)
+
+    // if there's an error after establishing connection with the mongoDB
+    // while application is running
     app.on("error", (error) => {
       console.log("MongoDB Error :: within app on :: ", error)
       throw error;
     })
+  })
+  .catch((error) => {
+    console.log("MongoDB Error :: winthin catch ", error)
   });
 
 // First Approach using IIFE (Imm. invoked func expression)
