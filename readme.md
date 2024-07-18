@@ -72,3 +72,39 @@ JWT (JSON Web Token) is used for securely transmitting information between parti
 - Bearer Token: `jwt` is a type of token that can be used like a key to access resources.
 - Refresh Token: Stored in the database for issuing new access tokens.
 - Access Token: Not stored in the database.
+
+```JavaScript
+req.body:  [Object: null prototype] {
+  fullName: 'one',
+  username: 'one',
+  email: 'one@mail.com',
+  password: '12345678'
+}
+
+req.files:  [Object: null prototype] {
+  avatar: [
+    {
+      fieldname: 'avatar',
+      originalname: 'pic1.jpg',
+      encoding: '7bit',
+      mimetype: 'image/jpeg',
+      destination: './public/temp',
+      filename: 'pic1.jpg',
+      path: 'public\\temp\\pic1.jpg',
+      size: 123
+    }
+  ],
+  coverImage: [
+    {
+      fieldname: 'coverImage',
+      originalname: 'boy.png',
+      encoding: '7bit',
+      mimetype: 'image/png',
+      destination: './public/temp',
+      filename: 'boy.png',
+      path: 'public\\temp\\boy.png',
+      size: 123
+    }
+  ]
+}
+```

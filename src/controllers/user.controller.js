@@ -24,7 +24,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const { username, email, fullName, password } = req.body;
 
   // testing
-  console.log("email: ", email);
+  // console.log("email: ", email);
 
   // validation - one by one
   // if(fullName === ""){
@@ -40,7 +40,12 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All field are required");
   }
 
-  const existedUser = User.findOne({
+
+  // console.log("req: ", req)
+  // console.log("req.body: ", req.body)
+  // console.log("req.files: ", req.files)
+
+  const existedUser = await User.findOne({
     // $or: [{}, {}]
     $or: [{ username }, { email }],
   });
@@ -51,8 +56,18 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // req.body -> has sara ka sara data
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  // const avatarLocalPath = req.files?.avatar[0]?.path;
+  let avatarLocalPath;
+  if(req.files && Array.isArray(req.files.avatar) && req.files.avatar.length > 0){
+    avatarLocalPath = req.files.avatar[0].path;
+  }
+
+  // const coverImageLocalPath = req.files?.coverImage[0]?.path; // returns undefined if coverImage has not been sent
+
+  let coverImageLocalPath;
+  if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+    coverImageLocalPath = req.files.coverImage[0].path;
+  }
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required");
@@ -69,7 +84,7 @@ const registerUser = asyncHandler(async (req, res) => {
     fullName,
     avatar: avatar.url,
     // if no coverImage
-    coverImage: coverImage.url || "",
+    coverImage: coverImage?.url || "",
     email,
     password,
     username: username.toLowerCase(),
