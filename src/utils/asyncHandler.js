@@ -8,7 +8,7 @@
 // Utility function to wrap async functions and handle errors
 // using PROMISE -> resolve, reject (or we can use catch)
 const asyncHandler = (requestHandler) => {
-  (req, res, next) => {
+  return (req, res, next) => {
     Promise.resolve(requestHandler(req, res, next))
 
       // if error occurs -> pass it to the next handler
