@@ -4,6 +4,28 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+// as we're going to generate ascess & refresh token again many time
+// lets wrap it in a function
+const generateAccessAndRefreshToken = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+
+    // store the refresh token in DB
+    await user.save({ validateBeforeSave: false }); // as we've already validated the user & pwd
+    // so just save the refresh Token in DB
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ApiError(
+      500,
+      "something went wrong while generating access and refresh tokens"
+    );
+  }
+};
 
 const registerUser = asyncHandler(async (req, res) => {
   // res.status(200).json({
@@ -40,7 +62,6 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All field are required");
   }
 
-
   // console.log("req: ", req)
   // console.log("req.body: ", req.body)
   // console.log("req.files: ", req.files)
@@ -58,14 +79,22 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // const avatarLocalPath = req.files?.avatar[0]?.path;
   let avatarLocalPath;
-  if(req.files && Array.isArray(req.files.avatar) && req.files.avatar.length > 0){
+  if (
+    req.files &&
+    Array.isArray(req.files.avatar) &&
+    req.files.avatar.length > 0
+  ) {
     avatarLocalPath = req.files.avatar[0].path;
   }
 
   // const coverImageLocalPath = req.files?.coverImage[0]?.path; // returns undefined if coverImage has not been sent
 
   let coverImageLocalPath;
-  if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+  if (
+    req.files &&
+    Array.isArray(req.files.coverImage) &&
+    req.files.coverImage.length > 0
+  ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
 
@@ -100,9 +129,134 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // return res.status(201).json({createdUser})
-  return res.status(201).json(
-    new ApiResponse(200, createdUser, "User registered successfully !!!")
-  )
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(200, createdUser, "User registered successfully !!!")
+    );
 });
 
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+  // username/email
+  // pwd
+  // > click on login
+  // check username/email in our DB
+  // match pwd of the user
+  // > if user exists && pwd matched:
+  //   generate AccessToken
+  //   generate refreshToken
+  //   > store these tokens in cookies and send it to user
+
+  const { username, email, password } = req.body;
+
+  // if both username and email are absent
+  if (!(username || email)) {
+    throw new ApiError(400, "username or email required");
+  }
+
+  // // simple method
+  // User.findOne({email})
+  // User.findOne({username})
+
+  // Adv Method
+  const user = await User.findOne({
+    // to find a document form the DB
+    // $or -> MongoDB operator
+    $or: [{ username }, { email }],
+
+    // find from either username or email
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User does not exists");
+  }
+
+  // User -> to access in DB
+  // user -> to access user data stored in our server
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(403, "Invalid user credentials");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user._id
+  );
+
+  // here we've to decide whether we need to contact DB again
+  // or store necessary values in anothe variable
+  const loggedInUser = User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  // options for COOKIES
+  const options = {
+    // now cookie is only modifiable by the SERVER
+    htmlOnly: true,
+    secure: true,
+
+    // frontend can only read it (write operation not available to them)
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+          // in case user wanst to save access and refresh tkn
+          // e.g. developing mobile app where cookie cannot be saved
+        },
+        "User logged In successfully !!"
+      )
+    );
+
+  //  NOTE :: we can also access cookie from req
+});
+
+const logoutUser = asyncHandler(async (req, res) => {
+  // clear cookies
+  // rmv refresh token form the DB
+
+  // User.findById(_id) // but id where???
+
+  // here comes -> middleware to the rescue
+
+  // now using verifyJWT (and next() inside it)
+  // we now have user data along with req
+  await User.findByIdAndUpdate(
+    // 1st arg -> give id of the document to the be found
+    req.user_id,
+
+    // 2ns arg -> what to update
+    {
+      $set: {
+        refreshToken: undefined,
+      },
+    },
+
+    // options
+    {
+      // now response will have updated value
+      new: true,
+    }
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User Logged Out Successfully !!"));
+});
+
+export { registerUser, loginUser, logoutUser };
