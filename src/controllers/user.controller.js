@@ -185,7 +185,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // here we've to decide whether we need to contact DB again
   // or store necessary values in anothe variable
-  const loggedInUser = User.findById(user._id).select(
+  const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
 
