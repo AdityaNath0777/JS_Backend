@@ -209,7 +209,7 @@ const loginUser = asyncHandler(async (req, res) => {
           user: loggedInUser,
           accessToken,
           refreshToken,
-          // in case user wanst to save access and refresh tkn
+          // in case user want to save access and refresh tkn
           // e.g. developing mobile app where cookie cannot be saved
         },
         "User logged In successfully !!"
