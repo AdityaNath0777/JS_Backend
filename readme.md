@@ -1,13 +1,21 @@
 # JS Backend
 
-A backend course to become a Full Stack Developer with professional and industry-level approaches.
+A backend course to become a Full Stack Developer with professional and industry-level approaches.  
 
-## Key Concepts
+# Key Concepts
+## Links
+- [env](#always-make-sure-to-exclude-env-from-bieng-pushed-to-the-public-repo-or-any-other-sensitive-place)
+- [DB](#db-is-always-in-another-continent)
+- [BSON](#mongodb-stores-all-of-its-data-in-bson-format)
+- [bcrypt](#bcrypt)
+- [jwt](#json-web-token-jwt)
+- [Access & Refresh Tokens](#access--refresh-tokens)
+- [cookies](#httponly-and-secure-cookies)
 
-### ALWAYS make sure to exclude **.env** from bieng pushed to the public repo or any other sensitive place 
+## ALWAYS make sure to exclude **.env** from bieng pushed to the public repo or any other sensitive place 
 - use .gitignore for it
 
-### DB is Always in Another Continent
+## DB is Always in Another Continent
 
 This phrase implies two main considerations:
 
@@ -33,7 +41,7 @@ This phrase implies two main considerations:
      }
      ```
 
-### ConnectDB Might Return a Promise
+## ConnectDB Might Return a Promise
 
 - The `connectDB` function may return a promise.
 - Use `.then` and `.catch` for handling the promise.
@@ -47,9 +55,9 @@ This phrase implies two main considerations:
     });
   ```
 
-### we will use **`app.use()`** mostly either for middleware or for configurations
+## we will use **`app.use()`** mostly either for middleware or for configurations
 
-### MongoDB stores all of its data in BSON format
+## MongoDB stores all of its data in BSON format
 - **Binary JSON** is just an extension of ***JSON***
 - supports more **Data Types** int, long, date, binary, etc
 
@@ -57,15 +65,15 @@ This phrase implies two main considerations:
 
 - **Efficient Traversal**: It includes metadata for efficient traversal and extraction, allowing for faster query operations in databases like MongoDB.
 
-### mongoose aggreagate pagination
+## mongoose aggreagate pagination
 
 
-### bcrypt
+## bcrypt
 Bcrypt helps to hash passwords:
 
 - Easier encryption and decryption: Provides a secure way to store passwords by hashing them.
 
-### JSON Web Token (JWT)
+## JSON Web Token (JWT)
 JWT (JSON Web Token) is used for securely transmitting information between parties:
 - Payload: fancy name for the data contained within the token.
 - Secret: Used to sign and verify the token.
@@ -108,3 +116,49 @@ req.files:  [Object: null prototype] {
   ]
 }
 ```
+
+## Access & Refresh Tokens
+
+### Access Token
+- **Definition**: A short-lived token used to access specific resources or services.
+- **Lifespan**: Typically valid for minutes to hours.
+- **Usage**: Sent with each request to the server to prove the user's identity and permissions.
+- **Example**: After logging into a website, an access token is issued to your browser, which is then included in requests to access your profile, post comments, etc.
+
+### Refresh Token
+- **Definition**: A long-lived token used to obtain a new access token without re-authenticating.
+- **Lifespan**: Valid for days to months.
+- **Usage**: Used to request a new access token when the current one expires.
+- **Example**: When the access token expires, the refresh token is used to automatically get a new access token, so you don’t have to log in again.
+
+## Why Use Refresh Tokens?
+
+Using refresh tokens provides enhanced security and user convenience:
+
+- **Reduced Risk**: Short-lived access tokens minimize the impact of token theft.
+- **Enhanced Control**: Servers can monitor refresh token usage and detect suspicious activity.
+- **User Convenience**: Users remain logged in without frequent re-authentication.
+
+## HttpOnly and Secure Cookies
+
+### HttpOnly
+- **Description**: Prevents client-side scripts from accessing the cookie, mitigating XSS attacks.
+- **Usage**: Set the `HttpOnly` attribute to `true`.
+
+### Secure
+- **Description**: Ensures the cookie is only sent over HTTPS, protecting it from MITM attacks.
+- **Usage**: Set the `Secure` attribute to `true`.
+
+## Example Scenarios
+
+1. **HttpOnly: true, Secure: true**
+   - Highest security for sensitive data.
+
+2. **HttpOnly: true, Secure: false**
+   - Rarely recommended due to risk of interception over HTTP.
+
+3. **HttpOnly: false, Secure: true**
+   - Allows client-side access with secure transmission.
+
+4. **HttpOnly: false, Secure: false**
+   - Least secure, only for non-sensitive data.
