@@ -231,15 +231,27 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   // now using verifyJWT (and next() inside it)
   // we now have user data along with req
-  await User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     // 1st arg -> give id of the document to be found
-    req.user_id,
+    req.user._id,
 
     // 2nd arg -> what to update
     {
-      $set: {
-        refreshToken: undefined,
+      // $unset if you want to completely remove the refreshToken field from the document.
+      // $set with null if you want to keep the field but reset its value.
+      $unset: {
+        refreshToken: 1,
       },
+      $set: {
+        refreshToken: null,
+      },
+
+      // MongoDB does not store fields with an undefined value, 
+      // thus it ignores undefined values.
+      // Using $set with undefined will not work.
+      // $set: {
+      //   refreshToken: undefined,
+      // },
     },
 
     // options
@@ -258,7 +270,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "User Logged Out Successfully !!"));
+    .json(new ApiResponse(200, user, "User Logged Out Successfully !!"));
 });
 
 // controller for endpoint for the refresh Access Token

@@ -226,3 +226,30 @@ db.orders.aggregate([
 ```
 
 pipeline -> aggr -> match -> lookup -> -> addFields -> project
+
+## MongoDB operators
+
+`$addFields`
+Adds new fields to documents. Similar to `$project`, `$addFields` reshapes each document in the stream; specifically, by adding new fields to output documents that contain both the existing fields from the input documents and the newly added fields.
+
+`$project`
+  - Reshapes each document in the stream, such as by adding new fields or removing existing fields. 
+  - For each input document, outputs one document.
+
+`$set`
+  + Adds new fields to documents. 
+  + Similar to` $project`, `$set` reshapes each document in the stream; specifically, by adding new fields to output documents that contain both the existing fields from the input documents and the newly added fields.
+
+  - `$set` is an alias for $addFields stage.
+
+`$unset` 
+  - Removes/excludes fields from documents.
+  - It is an alias for `$project` stage that removes fields.
+
+`$lookup`
+  - Performs a left outer join to another collection in the same database to filter in documents from the "joined" collection for processing. 
+
+`$match`
+  - Filters the document stream to allow only matching documents to pass unmodified into the next pipeline stage. 
+  - `$match` uses standard MongoDB queries. 
+  - For each input document, outputs either one document (a match) or zero documents (no match).
