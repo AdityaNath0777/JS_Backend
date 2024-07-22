@@ -1,9 +1,11 @@
 # JS Backend
 
-A backend course to become a Full Stack Developer with professional and industry-level approaches.  
+A backend course to become a Full Stack Developer with professional and industry-level approaches.
 
 # Key Concepts
+
 ## Links
+
 - [env](#always-make-sure-to-exclude-env-from-bieng-pushed-to-the-public-repo-or-any-other-sensitive-place)
 - [DB](#db-is-always-in-another-continent)
 - [BSON](#mongodb-stores-all-of-its-data-in-bson-format)
@@ -12,7 +14,8 @@ A backend course to become a Full Stack Developer with professional and industry
 - [Access & Refresh Tokens](#access--refresh-tokens)
 - [cookies](#httponly-and-secure-cookies)
 
-## ALWAYS make sure to exclude **.env** from bieng pushed to the public repo or any other sensitive place 
+## ALWAYS make sure to exclude **.env** from bieng pushed to the public repo or any other sensitive place
+
 - use .gitignore for it
 
 ## DB is Always in Another Continent
@@ -20,6 +23,7 @@ A backend course to become a Full Stack Developer with professional and industry
 This phrase implies two main considerations:
 
 1. **DB will mostly be very far away from the server**:
+
    - Fetching data from a distant database can take time.
    - Asynchronous operations will be used to handle data fetching efficiently.
      ```javascript
@@ -58,23 +62,26 @@ This phrase implies two main considerations:
 ## we will use **`app.use()`** mostly either for middleware or for configurations
 
 ## MongoDB stores all of its data in BSON format
-- **Binary JSON** is just an extension of ***JSON***
+
+- **Binary JSON** is just an extension of **_JSON_**
 - supports more **Data Types** int, long, date, binary, etc
 
--  designed to be **efficient** in both storage space and scan-speed.
+- designed to be **efficient** in both storage space and scan-speed.
 
 - **Efficient Traversal**: It includes metadata for efficient traversal and extraction, allowing for faster query operations in databases like MongoDB.
 
 ## mongoose aggreagate pagination
 
-
 ## bcrypt
+
 Bcrypt helps to hash passwords:
 
 - Easier encryption and decryption: Provides a secure way to store passwords by hashing them.
 
 ## JSON Web Token (JWT)
+
 JWT (JSON Web Token) is used for securely transmitting information between parties:
+
 - Payload: fancy name for the data contained within the token.
 - Secret: Used to sign and verify the token.
 - Bearer Token: `jwt` is a type of token that can be used like a key to access resources.
@@ -120,12 +127,14 @@ req.files:  [Object: null prototype] {
 ## Access & Refresh Tokens
 
 ### Access Token
+
 - **Definition**: A short-lived token used to access specific resources or services.
 - **Lifespan**: Typically valid for minutes to hours.
 - **Usage**: Sent with each request to the server to prove the user's identity and permissions.
 - **Example**: After logging into a website, an access token is issued to your browser, which is then included in requests to access your profile, post comments, etc.
 
 ### Refresh Token
+
 - **Definition**: A long-lived token used to obtain a new access token without re-authenticating.
 - **Lifespan**: Valid for days to months.
 - **Usage**: Used to request a new access token when the current one expires.
@@ -142,23 +151,78 @@ Using refresh tokens provides enhanced security and user convenience:
 ## HttpOnly and Secure Cookies
 
 ### HttpOnly
+
 - **Description**: Prevents client-side scripts from accessing the cookie, mitigating XSS attacks.
 - **Usage**: Set the `HttpOnly` attribute to `true`.
 
 ### Secure
+
 - **Description**: Ensures the cookie is only sent over HTTPS, protecting it from MITM attacks.
 - **Usage**: Set the `Secure` attribute to `true`.
 
 ## Example Scenarios
 
 1. **HttpOnly: true, Secure: true**
+
    - Highest security for sensitive data.
 
 2. **HttpOnly: true, Secure: false**
+
    - Rarely recommended due to risk of interception over HTTP.
 
 3. **HttpOnly: false, Secure: true**
+
    - Allows client-side access with secure transmission.
 
 4. **HttpOnly: false, Secure: false**
    - Least secure, only for non-sensitive data.
+
+## MongoDB Aggregation Pipelines
+
+An aggregation pipeline is a pipeline (no. of stages) that perform documents
+
+- output of a stage will be the onput for the next stage
+- each stage will perform an operation on the input (document) and pass the resultant (modified document) to the next stage
+- An aggragation pipeline can return resukts for groups of document (e.g. avg, max, min values)
+
+```javascript
+db.orders.aggregate([
+  // stage 1: e.g. filter by size
+  {
+    $match: { size: "medium" },
+  },
+
+  // stage 2: grp remaining documents by name and calc total
+  {
+    $group: { id: "$name", totalQuantity: { $sum: "quantity" } },
+  },
+
+  // stage 3, 4, 5, etc. as per the requirement
+  {
+    // joining ->left join
+    $lookup: {
+      from: "right_collection_name",
+      localField: "field_left",
+      foreignField: "field_right",
+      as: "field_name" // returns array
+    }
+  },
+
+  {
+    $addFields: {
+      "new_field": {
+        // $first: "field_name"
+        // or
+        arrayElemAt: ["field_name", pos_index]
+      }
+    }
+  },
+  {
+    // this will return only the selected fields
+    $project: {}
+  }
+]);
+
+```
+
+pipeline -> aggr -> match -> lookup -> -> addFields -> project

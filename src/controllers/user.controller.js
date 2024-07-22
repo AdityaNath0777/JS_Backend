@@ -453,6 +453,95 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Cover Image updated successfully"));
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params; // params -> URL e.g. x.com/AdityNath007
+
+  if (!username?.trim()) {
+    throw new ApiError(400, "username is missing");
+  }
+
+  // normal way
+  // User.find({username})
+  // here 1st we will find the user details using username
+  // then perform aggragate op.
+
+  // But we can directly do it using "$match"
+  // using aggregation pipelines
+
+  // it returns an array
+  const channel = await User.aggregate([
+    // 1st pipeline: $match
+    {
+      $match: {
+        username: username?.toLowerCase(),
+      },
+    },
+    {
+      $lookup: {
+        // remember?
+        // Subscriptions -> subscriptions (in MongoDB) (automatic conversion)
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscribersCount: {
+          // to calc count
+          $size: "$subscribers",
+        },
+        channelsSubscribedToCount: {
+          $size: "$subscribedTo",
+        },
+        // user subscribed to the channel or not
+        // user is the one who is sending req to access the channel
+        isSubscribed: {
+          $condition: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            // if true -> then merge? -> true
+            then: true,
+
+            // any else condition? -> false
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        // set flag to 1 to return
+        fullName: 1,
+        username: 1,
+        email: 1,
+        subscribersCount: 1,
+        channelsSubscribedToCount: 1,
+        avatar: 1,
+        coverImage: 1,
+      },
+    },
+  ]);
+
+  if (!channel?.length) {
+    throw new ApiError(404, "channel does not exists");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, channel[0], "User channel fetched successfully")
+    );
+});
+
 export {
   registerUser,
   loginUser,
