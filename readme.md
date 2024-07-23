@@ -2,6 +2,10 @@
 
 A backend course to become a Full Stack Developer with professional and industry-level approaches.
 
+- [Model link](https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj?origin=share)
+
+- [Video playlist](https://www.youtube.com/watch?v=EH3vGeqeIAo&list=PLu71SKxNbfoBGh_8p_NS-ZAh6v7HhYqHW)
+
 # Key Concepts
 
 ## Links
