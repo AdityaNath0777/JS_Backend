@@ -14,7 +14,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      throw new ApiError("Unauthorized Request");
+      throw new ApiError(401, "Unauthorized Request");
     }
 
     // we can generate the token but decode can only by the one which has the token

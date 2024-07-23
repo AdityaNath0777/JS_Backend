@@ -242,9 +242,9 @@ const logoutUser = asyncHandler(async (req, res) => {
       $unset: {
         refreshToken: 1,
       },
-      $set: {
-        refreshToken: null,
-      },
+      // $set: {
+      //   refreshToken: null,
+      // },
 
       // MongoDB does not store fields with an undefined value, 
       // thus it ignores undefined values.
